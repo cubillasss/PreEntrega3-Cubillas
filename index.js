@@ -1,7 +1,9 @@
 const txtPlace = document.querySelector("#txtPlace");
 const btnSearch = document.querySelector("#btnSearch");
 const cardTable = document.querySelector("#cardTable");
+const datalist = document.querySelector("#datalist");
 const baseUrl = 'http://api.weatherapi.com/v1';
+let results = [];
 
 btnSearch.addEventListener('click', async() => {
     await searchData();
@@ -11,7 +13,23 @@ const searchData = async() => {
     const response = await fetch(baseUrl+`/current.json?key=78eb8d2357be4c9983a223504232707&lang=es&q=${txtPlace.value}`);
     const weather = await response.json();
     writeWeather(weather);
+    addToStorage(txtPlace.value);
     txtPlace.value = "";
+}
+
+const addToStorage = (value) => {
+    if(results.length >= 5) {
+        results.shift();
+    }
+    results.push(value);
+    localStorage.setItem('results', results);
+    const container = document.createElement("div");
+    results.forEach(element => {
+        const option = document.createElement("option");
+        option.value = element;
+        container.appendChild(option);
+    });
+    datalist.replaceChildren(container);
 }
 
 const writeWeather = (info) => {
